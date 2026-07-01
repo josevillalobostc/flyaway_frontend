@@ -67,6 +67,18 @@ export interface BookingRequest {
   flightId: number;
 }
 
+export interface BookingDetailResponse {
+  id: number;
+  bookingDate: string;
+  flightId: number;
+  flightNumber: string;
+  estDepartureTime: string;
+  estArrivalTime: string;
+  customerId: number;
+  customerFirstName: string;
+  customerLastName: string;
+}
+
 const api = axios.create({
   baseURL: apiUrl,
   timeout: 5000,
@@ -102,5 +114,22 @@ export const bookFlight = async (
       Authorization: `Bearer ${token}`,
     },
   });
+  return response.data;
+};
+
+export const getBooking = async (
+  bookingId: number,
+  token: string,
+): Promise<BookingDetailResponse> => {
+  const response = await api.get(`/flights/book/${bookingId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const getFlightById = async (
+  flightId: number,
+): Promise<SingleFlightResponse> => {
+  const response = await api.get(`/flights/${flightId}`);
   return response.data;
 };

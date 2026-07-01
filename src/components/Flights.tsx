@@ -58,6 +58,11 @@ export default function Flights() {
           setBookingMessage(
             `Se reservó con éxito el vuelo ${flightNumber}. Id de booking: ${response.id}`,
           );
+          const savedBookings = JSON.parse(
+            localStorage.getItem("bookings") || "[]",
+          );
+          savedBookings.push(response.id);
+          localStorage.setItem("bookings", JSON.stringify(savedBookings));
         })
         .catch((e) => {
           setBookingMessage(
