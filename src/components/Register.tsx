@@ -57,7 +57,7 @@ export default function Register() {
       })
       .catch((e) => {
         setIsError(true);
-        setApiResponse(e.response.data || "Error");
+        setApiResponse(e?.response?.data?.message || (typeof e?.response?.data === 'string' ? e.response.data : "Error"));
       });
   };
 
@@ -76,7 +76,7 @@ export default function Register() {
   };
 
   return (
-    <div className="flex flex-row p-4 items-center justify-center font-mono">
+    <div className="flex flex-col p-4 items-center justify-center font-mono">
       <form className="text-white" onSubmit={handleSubmit}>
         <div className="p-4 gap-4">
           <label>Correo: </label>
@@ -122,12 +122,28 @@ export default function Register() {
 
         <button
           type="submit"
-          className="bg-gray-800 hover:bg-gray-600 hover:size-1/2 p-2 rounded-2xl shadow"
+          className="bg-gray-800 hover:bg-gray-600 p-2 rounded-2xl shadow"
         >
           Register
         </button>
         {isError ? <label>{apiResponse}</label> : <></>}
       </form>
+      <div className="flex gap-4 mt-4">
+        <button
+          type="button"
+          onClick={() => navigate("/login")}
+          className="bg-gray-800 hover:bg-gray-600 p-2 rounded-2xl shadow text-white"
+        >
+          Ya tienes cuenta? Inicia sesión
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate("/flights")}
+          className="bg-gray-800 hover:bg-gray-600 p-2 rounded-2xl shadow text-white"
+        >
+          Ir a Flights
+        </button>
+      </div>
     </div>
   );
 }

@@ -20,22 +20,39 @@ export default function Reservations() {
         localStorage.getItem("bookings") || "[]",
       );
       try {
-        const bookingsData = await Promise.all(
-          ids.map((id) => getBooking(id, token)),
-        );
-        const reservations = await Promise.all(
-          bookingsData.map(async (booking) => {
-            const flightDetail = await getFlightById(booking.flightId);
-            return {
-              id: booking.id, 
-              flightNumber: booking.flightNumber, 
-              airlineName: flightDetail.airlineName, 
-              estDepartureTime: booking.estDepartureTime
-            };
-          })
-        );
+        const bookingsData = (
+          await Promise.all(
+            ids.map((id) =>
+              getBooking(id, token).catch((e) => {
+                console.error(`Error fetching booking ${id}:`, e);
+                return null;
+              })
+            )
+          )
+        ).filter((booking) => booking !== null);
+
+        const reservations = (
+          await Promise.all(
+            bookingsData.map(async (booking) => {
+              try {
+                const flightDetail = await getFlightById(booking.flightId);
+                return {
+                  id: booking.id,
+                  flightNumber: booking.flightNumber,
+                  airlineName: flightDetail.airlineName,
+                  estDepartureTime: booking.estDepartureTime,
+                };
+              } catch (e) {
+                console.error(`Error fetching flight ${booking.flightId}:`, e);
+                return null;
+              }
+            })
+          )
+        ).filter((res) => res !== null);
+
         setBookings(reservations);
       } catch (e) {
+        console.error("Error global al cargar reservas:", e);
       }
     };
     fetchReservations();

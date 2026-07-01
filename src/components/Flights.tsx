@@ -11,6 +11,7 @@ import {
   type BookingResponse,
   type BookingRequest,
 } from "../api";
+import { useNavigate } from "react-router-dom";
 
 const formVacío: FlightSearch = {
   flightNumber: undefined,
@@ -20,6 +21,7 @@ const formVacío: FlightSearch = {
 };
 
 export default function Flights() {
+  const navigate = useNavigate();
   const token = localStorage.getItem("jwt_token");
   const [flightSearch, setFlightSearch] = useState<FlightSearch>(formVacío);
   const [flights, setFlights] = useState<FlightResponse | void>(() => {});
@@ -110,6 +112,13 @@ export default function Flights() {
             type="submit"
           >
             Buscar vuelos
+          </button>
+          <button
+            className="bg-emerald-600 p-2 shadow hover:bg-emerald-400 rounded-2xl"
+            type="button"
+            onClick={() => navigate("/reservations")}
+          >
+            Ir a reservas
           </button>
         </div>
       </form>

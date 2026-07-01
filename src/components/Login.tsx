@@ -55,7 +55,7 @@ export default function Login() {
       })
       .catch((e) => {
         setIsError(true);
-        setApiResponse(e.response.data || "Error");
+        setApiResponse(e?.response?.data?.message || (typeof e?.response?.data === 'string' ? e.response.data : "Error"));
         setToken(() => {});
         localStorage.removeItem("jwt_token");
       });
@@ -102,9 +102,16 @@ export default function Login() {
 
         <button
           type="submit"
-          className="bg-gray-800 hover:bg-gray-600 hover:size-1/2 p-2 rounded-2xl shadow"
+          className="bg-gray-800 hover:bg-gray-600 p-2 rounded-2xl shadow"
         >
           Login
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate("/register")}
+          className="bg-gray-800 hover:bg-gray-600 p-2 rounded-2xl shadow ml-4"
+        >
+          No tienes cuenta? Registrate
         </button>
         {isError ? <label>{apiResponse}</label> : <></>}
       </form>
