@@ -50,12 +50,14 @@ export default function Login() {
         setIsError(false);
         setApiResponse("Registro con éxito");
         setToken(tokenResponse);
+        localStorage.setItem("jwt_token", tokenResponse.token);
         navigate("/home");
       })
       .catch((e) => {
         setIsError(true);
         setApiResponse(e.response.data || "Error");
         setToken(() => {});
+        localStorage.removeItem("jwt_token")
       });
   };
 

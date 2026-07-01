@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 export interface RegisterRequest {
   email: string;
   firstName: string;
@@ -39,11 +41,18 @@ export interface SingleFlightResponse {
   flightNumber: string;
   estDepartureTime: string;
   estArrivalTime: string;
-  availableSeats: string;
+  availableSeats: number;
+}
+
+export interface FlightSearch {
+  flightNumber?: string;
+  airlineName?: string;
+  estDepartureTimeFrom?: string;
+  estDepartureTimeTo?: string;
 }
 
 export interface FlightResponse {
-  flights: SingleFlightResponse[];
+  items: SingleFlightResponse[];
 }
 
 export interface UserRegisterResponse {
@@ -51,7 +60,7 @@ export interface UserRegisterResponse {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: apiUrl,
   timeout: 5000,
 });
 
@@ -66,5 +75,12 @@ export const userLogin = async (
   LoginData: LoginRequest,
 ): Promise<TokenResponse> => {
   const response = await api.post("/auth/login", LoginData);
+  return response.data;
+};
+
+export const getFlights = async (
+  params: FlightSearch,
+): Promise<FlightResponse> => {
+  const response = await api.get("/flights/search", { params: params });
   return response.data;
 };
