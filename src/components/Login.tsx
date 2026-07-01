@@ -51,13 +51,13 @@ export default function Login() {
         setApiResponse("Registro con éxito");
         setToken(tokenResponse);
         localStorage.setItem("jwt_token", tokenResponse.token);
-        navigate("/home");
+        navigate("/flights");
       })
       .catch((e) => {
         setIsError(true);
         setApiResponse(e.response.data || "Error");
         setToken(() => {});
-        localStorage.removeItem("jwt_token")
+        localStorage.removeItem("jwt_token");
       });
   };
 

@@ -59,6 +59,14 @@ export interface UserRegisterResponse {
   id: number;
 }
 
+export interface BookingResponse {
+  id: number;
+}
+
+export interface BookingRequest {
+  flightId: number;
+}
+
 const api = axios.create({
   baseURL: apiUrl,
   timeout: 5000,
@@ -82,5 +90,17 @@ export const getFlights = async (
   params: FlightSearch,
 ): Promise<FlightResponse> => {
   const response = await api.get("/flights/search", { params: params });
+  return response.data;
+};
+
+export const bookFlight = async (
+  BookingData: BookingRequest,
+  token: string,
+): Promise<BookingResponse> => {
+  const response = await api.post("flights/book", BookingData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };

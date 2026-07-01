@@ -3,7 +3,14 @@ import {
   type ChangeEventHandler,
   type SubmitEventHandler,
 } from "react";
-import { getFlights, type FlightResponse, type FlightSearch } from "../api";
+import {
+  bookFlight,
+  getFlights,
+  type FlightResponse,
+  type FlightSearch,
+  type BookingResponse,
+  type BookingRequest,
+} from "../api";
 
 const formVacío: FlightSearch = {
   flightNumber: undefined,
@@ -13,16 +20,19 @@ const formVacío: FlightSearch = {
 };
 
 export default function Flights() {
+  const token = localStorage.getItem("jwt_token");
   const [flightSearch, setFlightSearch] = useState<FlightSearch>(formVacío);
   const [flights, setFlights] = useState<FlightResponse | void>(() => {});
   const [searched, setSearched] = useState(false);
+  const [auth] = useState<boolean>(token ? true : false);
+  const [bookingMessage, setBookingMessage] = useState<string | null>(null);
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    Object.fromEntries(
+    const query = Object.fromEntries(
       Object.entries(flightSearch).filter(([_, value]) => value !== ""),
     );
-    getFlights(flightSearch)
+    getFlights(query)
       .then((data) => {
         setFlights(data);
         setSearched(true);
@@ -40,9 +50,26 @@ export default function Flights() {
     }));
   };
 
+  const handleClick = async (flightId: number, flightNumber: string) => {
+    if (token) {
+      const request: BookingRequest = { flightId };
+      bookFlight(request, token)
+        .then((response) => {
+          setBookingMessage(
+            `Se reservó con éxito el vuelo ${flightNumber}. Id de booking: ${response.id}`,
+          );
+        })
+        .catch((e) => {
+          setBookingMessage(
+            `No se pudo reservar el vuelo. Error: ${e.response.data}`,
+          );
+        });
+    }
+  };
+
   return (
     <div className="text-white flex flex-col gap-2 font-mono">
-      <form onSubmit={handleSubmit} className="justify-self-start">
+      <form onSubmit={handleSubmit} className="p-6 bg-zinc-900">
         <div className="flex flex-cols items-center gap-4">
           <label>Número de vuelo</label>
           <input
@@ -81,19 +108,21 @@ export default function Flights() {
           </button>
         </div>
       </form>
+      {bookingMessage ? <div>{bookingMessage}</div> : <></>}
       {searched ? (
         flights?.items?.length === 0 ? (
           <div>No hay resultados</div>
         ) : (
-          <div className="w-full overflow-x-auto bg-gray-800 shadow-lg h-full">
+          <div className="w-full max-h-[60vh] overflow-auto bg-gray-800 shadow-lg">
             <table className="w-full text-left border-collapse">
-              <thead>
+              <thead className="sticky top-0 bg-gray-800">
                 <tr>
                   <th className="p-4 border-b border-gray-700"> Número </th>
                   <th className="p-4 border-b border-gray-700"> Aerolínea </th>
                   <th className="p-4 border-b border-gray-700"> Salida </th>
                   <th className="p-4 border-b border-gray-700"> Llegada </th>
                   <th className="p-4 border-b border-gray-700"> Asientos </th>
+                  <th className="p-4 border-b border-gray-700"> Reservar </th>
                 </tr>
               </thead>
               <tbody>
@@ -113,6 +142,17 @@ export default function Flights() {
                     </td>
                     <td className="p-4 border-b border-zinc-800">
                       {flight.availableSeats}
+                    </td>
+                    <td className="p-4 border-b border-zinc-800">
+                      <button
+                        className="p-2 rounded-2xl bg-zinc-900 items-center hover:bg-zinc-800 cursor-pointer shadow not-enabled:bg-zinc-800 not-enabled:hover:bg-zinc-800 not-enabled:cursor-not-allowed"
+                        onClick={() =>
+                          handleClick(flight.id, flight.flightNumber)
+                        }
+                        disabled={!auth}
+                      >
+                        Reservar
+                      </button>
                     </td>
                   </tr>
                 ))}

@@ -6,7 +6,7 @@ import Flights from "./components/Flights";
 function App() {
   return (
     <BrowserRouter>
-      <div className="bg-zinc-900 flex h-screen items-center justify-center">
+      <div className="bg-zinc-900 flex h-screen items-center pt-10 justify-center">
         <Routes>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
